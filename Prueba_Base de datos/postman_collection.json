@@ -1,0 +1,68 @@
+{
+  "info": {
+    "_postman_id": "pd-m4-sample",
+    "name": "PD M4 Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create customer",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\\n  \"national_id\":\"12345\",\\n  \"full_name\":\"Test User\"\\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/customers",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "customers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List customers",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/customers",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "customers"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Total paid per customer",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/reports/total-paid-per-customer",
+          "host": [
+            "http://localhost:3000"
+          ],
+          "path": [
+            "api",
+            "reports",
+            "total-paid-per-customer"
+          ]
+        }
+      }
+    }
+  ]
+}

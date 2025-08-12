@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Customers Dashboard - PD M4</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Customers Dashboard</h1>
+    <div id="form" class="mb-6 bg-white p-4 rounded shadow">
+      <h2 class="font-semibold mb-2">Create / Update Customer</h2>
+      <input id="national_id" placeholder="National ID" class="border p-2 w-full mb-2"/>
+      <input id="full_name" placeholder="Full name" class="border p-2 w-full mb-2"/>
+      <input id="address" placeholder="Address" class="border p-2 w-full mb-2"/>
+      <input id="phone" placeholder="Phone" class="border p-2 w-full mb-2"/>
+      <input id="email" placeholder="Email" class="border p-2 w-full mb-2"/>
+      <div class="flex gap-2">
+        <button id="createBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Create</button>
+        <button id="updateBtn" class="bg-yellow-500 text-white px-4 py-2 rounded">Update</button>
+        <button id="clearBtn" class="bg-gray-300 px-4 py-2 rounded">Clear</button>
+      </div>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow">
+      <h2 class="font-semibold mb-2">Customers List</h2>
+      <table class="w-full text-left" id="customersTable">
+        <thead><tr><th>id</th><th>national_id</th><th>full_name</th><th>email</th><th>actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+async function fetchCustomers(){
+  const res = await fetch('/api/customers');
+  const data = await res.json();
+  const tbody = document.querySelector('#customersTable tbody');
+  tbody.innerHTML = '';
+  data.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.customer_id}</td><td>${c.national_id}</td><td>${c.full_name}</td><td>${c.email||''}</td>
+      <td>
+        <button onclick="editCustomer(${c.customer_id})" class="bg-green-500 text-white px-2 rounded">Edit</button>
+        <button onclick="deleteCustomer(${c.customer_id})" class="bg-red-500 text-white px-2 rounded">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+async function createCustomer(){
+  const payload = {
+    national_id: document.getElementById('national_id').value,
+    full_name: document.getElementById('full_name').value,
+    address: document.getElementById('address').value,
+    phone: document.getElementById('phone').value,
+    email: document.getElementById('email').value
+  };
+  const res = await fetch('/api/customers', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  if(res.ok){ fetchCustomers(); clearForm(); } else { alert('Error creating'); }
+}
+
+async function updateCustomer(){
+  const id = document.getElementById('national_id').dataset.editId;
+  if(!id){ alert('Select a customer to update by clicking Edit'); return; }
+  const payload = {
+    full_name: document.getElementById('full_name').value,
+    address: document.getElementById('address').value,
+    phone: document.getElementById('phone').value,
+    email: document.getElementById('email').value
+  };
+  const res = await fetch('/api/customers/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  if(res.ok){ fetchCustomers(); clearForm(); } else { alert('Error updating'); }
+}
+
+function fillForm(c){
+  document.getElementById('national_id').value = c.national_id;
+  document.getElementById('national_id').dataset.editId = c.customer_id;
+  document.getElementById('full_name').value = c.full_name;
+  document.getElementById('address').value = c.address || '';
+  document.getElementById('phone').value = c.phone || '';
+  document.getElementById('email').value = c.email || '';
+}
+
+async function editCustomer(id){
+  const res = await fetch('/api/customers/' + id);
+  const c = await res.json();
+  fillForm(c);
+}
+
+async function deleteCustomer(id){
+  if(!confirm('Delete?')) return;
+  const res = await fetch('/api/customers/' + id, {method:'DELETE'});
+  if(res.ok) fetchCustomers();
+}
+
+function clearForm(){
+  document.getElementById('national_id').value = '';
+  document.getElementById('national_id').dataset.editId = '';
+  document.getElementById('full_name').value = '';
+  document.getElementById('address').value = '';
+  document.getElementById('phone').value = '';
+  document.getElementById('email').value = '';
+}
+
+document.getElementById('createBtn').addEventListener('click', createCustomer);
+document.getElementById('updateBtn').addEventListener('click', updateCustomer);
+document.getElementById('clearBtn').addEventListener('click', clearForm);
+
+fetchCustomers();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+const express = require('express');
+const app = express();
+const customersRouter = require('./routes/customers');
+const reportsRouter = require('./routes/reports');
+const path = require('path');
+app.use(express.json());
+app.use('/api/customers', customersRouter);
+app.use('/api/reports', reportsRouter);
+app.use(express.static(path.join(__dirname, '..', 'public')));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
